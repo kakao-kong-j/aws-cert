@@ -93,8 +93,71 @@
 
 ![https://cleverdj.tistory.com/122](../Image/NetworkACL.png)
 
+# VPC Peering
+
+- 프라이빗 IPv4 주소 또는 IPv6 주소를 사용하여 두 VPC 간에 트래픽을 라우팅할 수 있도록 하기 위한 두 VPC 사이의 네트워킹 연결
+- AWS는 VPC의 기존 인프라를 사용하여 VPC 피어링 연결을 생성
+  - 물리적 하드웨어 각각에 의존하지 않습니다
+  - 통신 또는 대역폭 병목에 대한 단일 지점 장애가 없습니다
+- VPC 피어링 연결의 어느 한 쪽에 위치하는 인스턴스가 퍼블릭 DNS 호스트 이름을 사용하여 상대방을 참조하는 경우 호스트 이름은 인스턴스의 퍼블릭 IP 주소로 확인
+  - 이 동작을 변경하려면 VPC 연결에 대해 DNS 호스트 이름 확인을 활성화
+  - 활성화 후, 퍼블릭 DNS 호스트 이름을 사용하여 상대방을 참조하는 경우 호스트 이름은 인스턴스의 프라이빗 IP 주소로 확인
+
+## How to Make VPC Peering
+
+1. 요청자 VPC의 소유자가 수락자 VPC의 소유자에게 VPC 피어링 연결을 생성하도록 요청
+   - 요청자 VPC의 CIDR 블록과 중첩되는 CIDR 블록은 사용할 수 없음
+1. 수락자 VPC의 소유자가 VPC 피어링 연결 요청을 수락하여 VPC 피어링 연결을 활성화
+1. 각 VPC의 소유자가 다른 VPC의 IP 주소 범위를 가리키는 경로를 하나 이상의 VPC 라우팅 테이블에 수동으로 추가
+1. Security Group을 업데이트
+
+## VPC Peering Life Cycle
+
+![https://docs.aws.amazon.com/ko_kr/vpc/latest/peering/vpc-peering-basics.html](../Image/peering-lifecycle-diagram.png)
+
+- Initiating-request
+  - VPC 피어링 연결 요청이 시작되었습니다. 이 단계에서는 피어링 연결이 실패하거나 pending-acceptance로 이동할 수 있습니다.
+- Failed
+  - VPC 피어링 연결 요청이 실패
+  - VPC 피어링 연결 요청을 수락, 거부하거나 삭제할 수 없음
+  - 실패한 VPC 피어링 연결은 2시간 동안 요청자에게 보이는 상태
+- Pending-acceptance
+  - VPC 피어링 연결 요청이 수락자 VPC 소유자의 수락을 기다리고 있는 상태
+  - 아무런 조치도 취하지 않으면 요청이 7일 후에 만료
+  - 요청자가 요청 삭제 가능
+- Expired
+  - VPC 피어링 연결 요청이 만료
+  - 양쪽 host 모두 어떤 요청도 X
+  - 2일 동안 노출
+- Rejected
+  - 수락자 VPC의 소유자가 거부
+  - 거부된 VPC 피어링 연결은 2일 동안 요청자 VPC의 소유자에게 표시되고, 수락자 VPC의 소유자에게는 2시간 동안 표시
+  - 같은 AWS 계정 내라면 2시간동안 노출
+- Provisioning
+  - VPC 피어링 연결 요청이 수락
+  - 곧 active
+- Active
+  - VPC 피어링 연결이 활성화
+  - VPC 사이에서 트래픽이 전달
+  - VPC 피어링 연결을 삭제 가능, 거부 불가능
+- Deleting
+  - active 상태인 VPC 피어링 연결 삭제 요청을 제출
+  - pending-acceptance 상태인 VPC 피어링 연결 요청을 삭제하는 요청
+- Deleted
+  - active VPC 피어링 연결을 삭제
+  - pending-acceptance VPC 피어링 연결 요청을 삭제
+  - VPC 피어링 연결은 2일 동안 요청자 VPC의 소유자에게 표시되고, 수락자 VPC의 소유자에게는 2시간 동안 표시
+  - 같은 AWS 계정 내라면 2시간동안 노출
+
+## Multiple Peering
+
+- VPC 피어링 연결은 두 VPC 간에 일대일 관계
+  ![https://docs.aws.amazon.com/ko_kr/vpc/latest/peering/vpc-peering-basics.html](../Image/one-to-two-vpcs-flying-v.png)
+- 전이성 피어링 관계는 지원되지 않음
+
 ## Reference
 
 - [44bits](https://www.44bits.io/ko/post/understanding_aws_vpc)
+- [AWS Document](https://docs.aws.amazon.com/ko_kr/vpc/latest/peering/what-is-vpc-peering.html)
 - [할롬님의 블로그](https://cleverdj.tistory.com/122)
 - [동적 호스트 구성 프로토콜](https://ko.wikipedia.org/wiki/%EB%8F%99%EC%A0%81_%ED%98%B8%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1_%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C)
