@@ -96,3 +96,5 @@
 ## Reference
 
 - [44bits](https://www.44bits.io/ko/post/understanding_aws_vpc)
+- [할롬님의 블로그](https://cleverdj.tistory.com/122)
+- [동적 호스트 구성 프로토콜](https://ko.wikipedia.org/wiki/%EB%8F%99%EC%A0%81_%ED%98%B8%EC%8A%A4%ED%8A%B8_%EA%B5%AC%EC%84%B1_%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C)
